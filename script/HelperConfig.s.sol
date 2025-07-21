@@ -3,14 +3,18 @@
 pragma solidity ^0.8.18;
 
 import { Script } from "forge-std/Script.sol";
+import { MockV3Aggregator } from "../test/mocks/MockV3Aggregator.sol";
 
-contract HelperConfig {
+contract HelperConfig is Script {
 
     NetworkConfig public activeNetworkConfig;
 
     struct NetworkConfig {
         address priceFeed; // eth/usd
     }
+
+    uint8 public constant DECIMALS = 8;
+    int public constant INITIAL_PRICE = 2000e8; // 2000 USD per ETH
 
     constructor() {
         if (block.chainid == 11155111) { // Sepolia
@@ -39,7 +43,15 @@ contract HelperConfig {
         return zkSyncConfig;
     }
 
-    function getAnvilEthConfig()  public pure returns (NetworkConfig memory) {
-        
+    function getAnvilEthConfig()  public returns (NetworkConfig memory) {
+        vm.startBroadcast();
+        MockV3Aggregator mockPriceFeed = new MockV3Aggregator(DECIMALS, INITIAL_PRICE);
+        vm.stopBroadcast();
+
+        NetworkConfig memory anvilConfig = NetworkConfig({
+            priceFeed: address(mockPriceFeed) // Mock aggregator address
+        });
+
+        return anvilConfig;
     }
 }
