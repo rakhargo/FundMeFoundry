@@ -11,6 +11,7 @@ contract FundMeTest is Test {
     address USER = makeAddr("user");
     uint constant SEND_VALUE = 0.1 ether;
     uint constant STARTING_BALANCE = 10 ether;
+    uint constant GAS_PRICE = 1;
 
     // run 'forge test --match-test {functionTestName} -vvv' to run a specific function test
 
@@ -71,8 +72,14 @@ contract FundMeTest is Test {
         uint startingOwnerBalance = fundMe.getOwner().balance;
         uint startingFundMeBalance = address(fundMe).balance;
 
+        // uint gasStart = gasleft();
+        // vm.txGasPrice(GAS_PRICE);
         vm.prank(fundMe.getOwner());
         fundMe.withdraw();
+
+        // uint gasEnd = gasleft();
+        // uint gasUsed = (gasStart - gasEnd) * tx.gasprice;
+        // console.log("Gas used for withdrawal:", gasUsed);
 
         uint endingOwnerBalance = fundMe.getOwner().balance;
         uint endingFundMeBalance = address(fundMe).balance;
